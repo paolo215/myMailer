@@ -8,6 +8,14 @@ import sys
 import getpass
 
 
+def usage():
+    print """Commands: (Delimeter for multiple inputs = ", ")
+    -f input files 
+    -s subject
+    -e email
+    -m text message
+    """
+
 def main(argv):
 	sender = "paolo.villanueva.215.sender@gmail.com"
 	subject = "No Subject"
@@ -16,15 +24,17 @@ def main(argv):
 	message = ""
 	password = ""
 	try:
-		opts, args = getopt.getopt(argv, "e:s:m:f:t:", ["email", 
+            opts, args = getopt.getopt(argv, "h:e:s:m:f:t:", ["help", "email", 
 				"subject", "message", "file"])
 	except getopt.GetoptError:
 		sys.exit()
 
 	for opt, arg in opts:
 		print opt, arg
-		if opt in ("-f", "--file"):
-			file1 = arg
+                if opt in ("-h", "--help"):
+                    usage()
+                elif opt in ("-f", "--file"):
+			file1 = arg.split(", ")
 		elif opt in ("-s", "--subject"):
 			subject = arg
 		elif opt in ("-e", "--email"):
@@ -32,7 +42,7 @@ def main(argv):
 		elif opt in ("-m", "--message"):
 			message = arg
 		else:
-			sys.exit()
+			usage()
 
 	password = getpass.getpass("Enter mailer password: ")
 	if not password:
@@ -43,14 +53,14 @@ def main(argv):
 	msg["From"] = sender
 	msg["To"] = ", ".join(to)
 	msg.attach(MIMEText(message))
-	part = MIMEBase("application", "octet-stream")
-	if file1:
-		part.set_payload(open(file1, "rb").read())
-	Encoders.encode_base64(part)
 
-	part.add_header("Content-Disposition", "attachment; filename=" + file1)
-
-	msg.attach(part)
+        if file1:
+            for i in file1:
+	        part = MIMEBase("application", "octet-stream")
+	        part.set_payload(open(i, "rb").read())
+	        Encoders.encode_base64(part)
+	        part.add_header("Content-Disposition", "attachment; filename=" + i)
+	        msg.attach(part)
 	try:
 		smtp = smtplib.SMTP("smtp.gmail.com", 587)
 		smtp.starttls()
