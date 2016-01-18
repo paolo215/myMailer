@@ -15,6 +15,8 @@ def usage():
     -e email
     -m text message
     """
+    sys.exit(1)
+
 
 def main(argv):
 	sender = "paolo.villanueva.215.sender@gmail.com"
@@ -24,9 +26,10 @@ def main(argv):
 	message = ""
 	password = ""
 	try:
-            opts, args = getopt.getopt(argv, "h:e:s:m:f:t:", ["help", "email", 
+            opts, args = getopt.getopt(argv, "he:s:m:f:t:", ["help", "email", 
 				"subject", "message", "file"])
 	except getopt.GetoptError:
+                print "error"
 		sys.exit()
 
 	for opt, arg in opts:
